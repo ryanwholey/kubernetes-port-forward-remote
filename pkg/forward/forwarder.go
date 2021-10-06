@@ -40,7 +40,7 @@ type Forwarder struct {
 	pod string
 }
 
-func (f *Forwarder) Forward(ctx context.Context, spec Spec, stopChan chan struct{}) error {
+func (f *Forwarder) Forward(ctx context.Context, spec Spec, stopChan chan struct{}, readyChan chan struct{}) error {
 	err := f.createPod(ctx, spec)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func (f *Forwarder) Forward(ctx context.Context, spec Spec, stopChan chan struct
 		return err
 	}
 
-	fw, err := portforward.New(dialer, []string{spec.String()}, stopChan, make(chan struct{}), f.Out, f.ErrOut)
+	fw, err := portforward.New(dialer, []string{spec.String()}, stopChan, readyChan, f.Out, f.ErrOut)
 	if err != nil {
 		return err
 	}
